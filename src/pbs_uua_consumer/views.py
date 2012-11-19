@@ -134,7 +134,7 @@ def login_begin(request, popup_mode=1, template_name='openid/login.html',
 
     # Request some user details.
     openid_request.addExtension(
-        sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
+        sreg.SRegRequest(required=['email', 'fullname', 'nickname', 'postcode']))
 
     # Construct the request completion URL, including the page we
     # should redirect to.
