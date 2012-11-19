@@ -93,10 +93,9 @@ def parse_openid_response(request):
 
 
 def login_begin(request, popup_mode=1, template_name='openid/login.html',
-                redirect_field_name=REDIRECT_FIELD_NAME):
+                redirect_field_name=REDIRECT_FIELD_NAME, to_admin=0):
     """Begin an OpenID login request, possibly asking for an identity URL."""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
-
     # Get the OpenID URL to try.  First see if we've been configured
     # to use a fixed server URL.
     openid_url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
@@ -146,6 +145,12 @@ def login_begin(request, popup_mode=1, template_name='openid/login.html',
         else:
             return_to += '?'
         return_to += urllib.urlencode({redirect_field_name: redirect_to})
+    if to_admin > 0:
+        if '?' in return_to:
+            return_to += '&'
+        else:
+            return_to += '?'
+        return_to += urllib.urlencode({'to_admin': 1})
 
     return render_openid_request(request, openid_request, return_to)
 
@@ -153,7 +158,7 @@ def login_begin(request, popup_mode=1, template_name='openid/login.html',
 def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
     """ Handle the OpenId response"""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
-
+    to_admin = int(request.REQUEST.get('to_admin', 0))
     openid_response = parse_openid_response(request)
     if not openid_response:
         # we have no response so we should send the RP endpoint message
@@ -165,6 +170,8 @@ def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
         user = authenticate(openid_response=openid_response)
         if user is not None:
             if user.is_active:
+                if to_admin > 0 and not user.is_staff:
+                    return render_response(request, 'Permission Denied')
                 # login the user
                 auth_login(request, user)
                 if popup:

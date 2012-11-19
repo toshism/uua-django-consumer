@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy, ugettext as _
-from django import http, template
+from django.utils.translation import ugettext as _
+from django import template
 from django.shortcuts import render_to_response
 from pbs_uua_consumer.models import Nonce, Association, UserOpenID
 from pbs_uua_consumer.store import DjangoOpenIDStore
-from django.views.decorators.cache import never_cache
+
 
 """ Integrates the application with the admin interface.
 Registers admin models and the authentication backend with Django admin.
@@ -53,9 +53,6 @@ admin.site.register(UserOpenID, UserOpenIDAdmin)
 
 # Support for allowing openid authentication for /admin (django.contrib.admin)
 if getattr(settings, 'OPENID_USE_AS_ADMIN_LOGIN', False):
-
-    from django.http import HttpResponseRedirect
-    from pbs_uua_consumer import views
 
     def _openid_login(self, request, error_message='', extra_context=None):
         context = {

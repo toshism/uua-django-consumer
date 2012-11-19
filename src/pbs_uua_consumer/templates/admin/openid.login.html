@@ -6,19 +6,19 @@
 <script type="text/javascript" src="{{ sso_js_url }}popup.js"></script>
 {% endblock %}
 
-{% block content %}
+{% block inner_content %}
     {{ block.super }}
 
     {% if popup_mode %}
         <script>
-        LOGIN_PATH_POPUP_ENABLED = '{{ sso_url }}';
+        LOGIN_PATH_POPUP_ENABLED = '{{ sso_admin_url }}';
         LOGIN_PATH_WITH_REDIRECT = '';
         LOGIN_PROCESSING_PAGE = '';
         </script>
     {% endif %}
 
-    <p>{% trans 'Or:' %}</p>
+        <p style="text-align:center;">{% trans 'Or:' %}</p>
         <div class="form-row" style="text-align:center;">
-           {{ openid_login_link }}
+           {{ openid_admin_login_link }}
         </div>
 {% endblock %}
